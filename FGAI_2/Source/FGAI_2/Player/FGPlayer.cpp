@@ -3,6 +3,7 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "FGAI_2/Grid/FGGridActor.h"
+#include "FGAI_2/MyStuff/Grid/PathingGrid.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -19,12 +20,12 @@ void AFGPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	TArray<AActor*> AllGridActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFGGridActor::StaticClass(), AllGridActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APathingGrid::StaticClass(), AllGridActors);
 
 	if (AllGridActors.Num() > 0)
 	{
 		// just pick the first for now
-		CurrentGridActor = Cast<AFGGridActor>(AllGridActors[0]);
+		CurrentGridActor = Cast<APathingGrid>(AllGridActors[0]);
 	}
 }
 

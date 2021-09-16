@@ -7,6 +7,14 @@ struct FCellIndex
 	GENERATED_BODY()
 	
 public:
+
+	FCellIndex(int R, int C)
+	{
+		Row = R;
+		Column = C;
+	};
+
+	FCellIndex(){};
 	
 	int Row;
 

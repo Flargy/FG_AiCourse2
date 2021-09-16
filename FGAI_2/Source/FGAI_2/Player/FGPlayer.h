@@ -4,7 +4,7 @@
 #include "FGPlayer.generated.h"
 
 class UCameraComponent;
-class AFGGridActor;
+class APathingGrid;
 
 UCLASS()
 class AFGPlayer : public APawn
@@ -23,7 +23,7 @@ public:
 	UCameraComponent* CameraComponent = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Player")
-	AFGGridActor* CurrentGridActor = nullptr;
+	APathingGrid* CurrentGridActor = nullptr;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Player")
     float HorizontalMovementSpeed = 3000.0f;

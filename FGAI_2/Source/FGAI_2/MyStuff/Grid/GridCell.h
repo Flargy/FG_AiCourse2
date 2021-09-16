@@ -4,7 +4,7 @@
 #include "CellIndex.h"
 #include "GridCell.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FGridCell
 {
 	GENERATED_BODY()
@@ -14,6 +14,9 @@ public:
 
 	UPROPERTY()
 	FVector Location;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Tile")
+	bool bBlock = false;
 
 	UPROPERTY()
 	float PathCostMultiplier = 1.0f;
