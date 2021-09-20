@@ -165,6 +165,7 @@ void APathingGrid::UpdateBlockingTiles()
 		for (int32 Index = 0, Num = BlockIndices.Num(); Index < Num; ++Index)
 		{
 			AllCells[BlockIndices[Index]].bBlock = true;
+			AllCells[BlockIndices[Index]].Type = Block->Type;
 		}
 	}
 
@@ -209,7 +210,11 @@ void APathingGrid::BuildGrid()
 {
 	if (Rows < 1 || Columns < 1)
 		return;
-
+	
+	const float Location_X = -(Rows * TileSize * 0.5f);
+	const float Location_Y = -(Columns * TileSize * 0.5f);
+	
+#pragma region DrawBoxEdges
 	if (MeshDescription == nullptr)
 		MeshDescription = UStaticMesh::CreateStaticMeshDescription(this);
 
@@ -221,14 +226,12 @@ void APathingGrid::BuildGrid()
 	FPolygonGroupID PGID = MeshDescription->CreatePolygonGroup();
 	FPolygonID PID;
 
-	float Location_X = -((Rows * TileSize) * 0.5f);
-	float Location_Y = -((Columns * TileSize) * 0.5f);
+	
 
 	for (int X = 0; X < Rows + 1; ++X)
 	{
 		float LocationOffset = X * TileSize;
 		FVector Center = FVector(Location_X + LocationOffset, 0.0f, 0.0f);
-		FVector Test1 = FVector(BorderSize, GetHeightSize(), BorderSize);
 		MeshDescription->CreateCube(Center, GetWidthExtends(), PGID, PID, PID, PID, PID, PID, PID);
 	}
 
@@ -236,7 +239,6 @@ void APathingGrid::BuildGrid()
 	{
 		float LocationOffset = Y * TileSize;
 		FVector Center = FVector(0.0f, Location_Y + LocationOffset, BorderSize);
-		FVector Test = FVector(GetWidthSize(), BorderSize, BorderSize);
 		MeshDescription->CreateCube(Center, GetHeightExtends(), PGID, PID, PID, PID, PID, PID, PID);
 	}
 
@@ -244,6 +246,29 @@ void APathingGrid::BuildGrid()
 	MeshDescriptionList.Add(MeshDescription);
 	GridMesh->BuildFromStaticMeshDescriptions(MeshDescriptionList);
 	StaticMeshComponent->SetStaticMesh(GridMesh);
+	
+	
+
+#pragma endregion
+
+#pragma region CreateCells
+	
+	FVector ZeroPos = FVector(Location_X + TileSize * 0.5f, Location_Y + TileSize * 0.5f, GetActorLocation().Z);
+	
+	for(int r = 0; r < Rows; r++)
+	{
+		for (int c = 0; c < Columns; c++)
+		{
+			FVector CellOffset = FVector(TileSize * r, TileSize * c, 0.0f) + ZeroPos;
+			AllCells[Rows * r + c] = FGridCell(CellOffset);
+			UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f"),CellOffset.X, CellOffset.Y)
+		}
+	}
+
+#pragma endregion
+
+	AssignNeighbors();
+	
 }
 
 void APathingGrid::DrawBlocks()
@@ -275,11 +300,15 @@ void APathingGrid::DrawBlocks()
 		{
 			const FVector TileRelativeLocation = GetActorTransform().InverseTransformPositionNoScale(GetWorldLocationFromXY(X, Y));
 			const int32 ArrayIndex = GetTileIndexFromXY(X, Y);
-			const bool bIsBlocked = AllCells[ArrayIndex].bBlock;
+			const ETileType Type = AllCells[ArrayIndex].Type;
 
-			if (bIsBlocked)
+			if (Type == Wall)
 			{
 				BlockMeshDescription->CreateCube(TileRelativeLocation, BlockExtent, BlockPGID, PID, PID, PID, PID, PID, PID);
+			}
+			if(Type == Water)
+			{
+				BlockMeshDescription->CreateCube(TileRelativeLocation, BlockExtent * 0.5f, BlockPGID, PID, PID, PID, PID, PID, PID);
 			}
 		}
 	}
@@ -293,6 +322,25 @@ void APathingGrid::DrawBlocks()
 	}
 }
 
-void APathingGrid::AssignNeighbors(int Row, int Column)
+void APathingGrid::AssignNeighbors()
 {
+	for(int r = 0; r < Rows; r++)
+	{
+		for (int c = 0; c < Columns; c++)
+		{
+			for(int i = 0; i < 8; i++)
+			{
+				int x = Directions[i].Dx;
+				int y = Directions[i].Dy;
+
+				if(r + x >= Rows || r + x < 0 || c + y >= Columns || c + y < 0)
+				{
+					continue;
+				}
+				const FCellIndex AdjacentCellIndex = FCellIndex(r + x,c + y);
+				AllCells[Rows * r + c].SetNeighbor(AdjacentCellIndex);
+				//UE_LOG(LogTemp, Log, TEXT("Me: %d:%d  Neighbor: %d:%d"),r,c,r + x, c + y)
+			}
+		}
+	}
 }

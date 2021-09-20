@@ -2,25 +2,14 @@
 
 #include "GameFramework/Actor.h"
 #include "GridCell.h"
+#include "FGAI_2/MyStuff/Interfaces/AStarSearchInterface.h"
+
 #include "PathingGrid.generated.h"
 
-USTRUCT(BlueprintType)
-struct FTileInfo
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY()
-	FGridCell Cell;
-
-	UPROPERTY()
-	float DistanceToGoal;
-
-	UPROPERTY()
-	float TotalCost;
-
-	UPROPERTY()
-	FCellIndex PreviousCell;
-};
+struct FDirectionIndex{
+	int Dx;
+	int Dy;
+}; 
 
 class UStaticMeshComponent;
 class UStaticMesh;
@@ -46,6 +35,9 @@ public:
 #pragma endregion
 	
 #pragma region Variables
+	
+	TArray<FDirectionIndex> Directions = { {-1,-1,},{-1,0,},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1} };
+	
 	UPROPERTY()
 	UStaticMeshComponent* StaticMeshComponent = nullptr;
 
@@ -91,6 +83,11 @@ public:
 	FGridCell GetCellFromVector(FVector Location);
 
 	FGridCell GetCellFromIndex(FCellIndex Index);
+
+	int TestFunctionToCall(TFunctionRef<int(int Value)> ReceivedFunction)
+	{
+		return ReceivedFunction(5);
+	}
 
 	UFUNCTION(BlueprintPure, Category = "Grid")
     float GetTileSizeHalf() const { return TileSize * 0.5f; }
@@ -161,7 +158,7 @@ private:
 
 	void DrawBlocks();
 	
-	void AssignNeighbors(int Row, int Column);
+	void AssignNeighbors();
 	
 #pragma endregion 
 };

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "FGAI_2/MyStuff/Grid/TileTypes.h"
 #include "FGGridBlockComponent.generated.h"
+
+
 
 UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent))
 class FGAI_2_API UFGGridBlockComponent : public USceneComponent
@@ -15,6 +18,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FVector Extents = FVector(500.0f, 500.0f, 100.0f);
+
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<ETileType> Type = Wall;
 
 #if WITH_EDITOR
 	/*

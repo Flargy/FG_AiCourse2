@@ -19,4 +19,9 @@ public:
 	int Row;
 
 	int Column;
+
+	FORCEINLINE bool operator==(const FCellIndex &Other) const
+	{
+		return Other.Column == Column && Other.Row == Row;
+	}
 };
