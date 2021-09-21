@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AStarSearchInterface.h"
 #include "GameFramework/Actor.h"
+#include "TestHeuristics.h"
 #include "InterfaceTestActor.generated.h"
 
 class APathingGrid;
 
 UCLASS()
-class FGAI_2_API AInterfaceTestActor : public AActor, public IAStarSearchInterface
+class FGAI_2_API AInterfaceTestActor : public AActor
 {
 	GENERATED_BODY()
 
@@ -20,12 +20,14 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	APathingGrid* Grid;
-
-protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void Destroyed() override;
+
+	TestHeuristics* Test; // this or the other version
+	//TestHeuristics Test;
 };

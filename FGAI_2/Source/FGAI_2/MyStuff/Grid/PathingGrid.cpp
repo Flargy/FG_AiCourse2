@@ -1,6 +1,7 @@
 #include "PathingGrid.h"
 #include "Components/StaticMeshComponent.h"
 #include "FGAI_2/Grid/FGGridBlockComponent.h"
+#include "FGAI_2/MyStuff/Interfaces/HeuristicInterface.h"
 #include "StaticMeshDescription.h"
 
 
@@ -43,6 +44,11 @@ void APathingGrid::OnConstruction(const FTransform& Transform)
 
 	UpdateBlockingTiles();
 	DrawBlocks();
+}
+
+int APathingGrid::TestFunctionToCall(IHeuristicInterface* ReceivedFunction)
+{
+	return ReceivedFunction->TestFunctionPassing(83);
 }
 
 int32 APathingGrid::GetTileIndexFromXY(int32 TileX, int32 TileY) const

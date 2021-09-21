@@ -2,18 +2,22 @@
 
 #include "GameFramework/Actor.h"
 #include "GridCell.h"
-#include "FGAI_2/MyStuff/Interfaces/AStarSearchInterface.h"
-
 #include "PathingGrid.generated.h"
 
 struct FDirectionIndex{
 	int Dx;
 	int Dy;
+
+	bool operator ==(FDirectionIndex const OtherIndex ) const
+	{
+		return OtherIndex.Dx == Dx && OtherIndex.Dy == Dy;
+	}
 }; 
 
 class UStaticMeshComponent;
 class UStaticMesh;
 class UStaticMeshDescription;
+class IHeuristicInterface;
 
 UCLASS()
 class APathingGrid : public AActor
@@ -84,9 +88,11 @@ public:
 
 	FGridCell GetCellFromIndex(FCellIndex Index);
 
-	int TestFunctionToCall(TFunctionRef<int(int Value)> ReceivedFunction)
+	int TestFunctionToCall(IHeuristicInterface* ReceivedFunction);
+
+	void TestStaticCall(TFunctionRef<void()> ReceivedFunction)
 	{
-		return ReceivedFunction(5);
+		ReceivedFunction();
 	}
 
 	UFUNCTION(BlueprintPure, Category = "Grid")
