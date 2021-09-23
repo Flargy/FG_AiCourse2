@@ -20,6 +20,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	APathingGrid* Grid;
+
+	UPROPERTY(EditInstanceOnly)
+	AActor* GoalPoint;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -28,6 +32,6 @@ public:
 
 	virtual void Destroyed() override;
 
-	TestHeuristics* Test; // this or the other version
+	//TestHeuristics* Test; // this or the other version
 	//TestHeuristics Test;
 };

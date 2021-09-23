@@ -1,7 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InterfaceTestActor.h"
+
 #include "StaticNamespaceTest.h"
+#include "FGAI_2/MyStuff/AStar/AStarPathFinder.h"
 #include "FGAI_2/MyStuff/Grid/PathingGrid.h"
 
 using namespace AStar;
@@ -18,23 +20,13 @@ void AInterfaceTestActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Test = new TestHeuristics();
-	
 	if(Grid)
 	{
-		int Value = Grid->TestFunctionToCall(Test);
+		const FVector MyLocation = GetActorLocation();
+		const FVector GoalLocation = GoalPoint->GetActorLocation();
 		
-		UE_LOG(LogTemp, Warning, TEXT("Test function returned: %d"), Value)
-		
-		Grid->TestStaticCall(FHeuristicCalculations::CallableFunction1);
+		FAStarPathFinder::GeneratePath(Grid, FHeuristicCalculations::BasicHeuristics, MyLocation, GoalLocation);
 	}
-
-	FHeuristicCalculations::CallableFunction1();
-	
-	UE_LOG(LogTemp, Warning, TEXT("Calling function %d"), FHeuristicCalculations::CallableFunction2());
-	
-	FHeuristicCalculations::CallableFunction3();
-
 }
 
 // Called every frame
@@ -45,7 +37,7 @@ void AInterfaceTestActor::Tick(float DeltaTime)
 
 void AInterfaceTestActor::Destroyed()
 {
-	delete Test;
+	//delete Test;
 	Super::Destroyed();
 }
 

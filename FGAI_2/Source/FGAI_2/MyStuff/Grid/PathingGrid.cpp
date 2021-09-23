@@ -21,15 +21,6 @@ APathingGrid::APathingGrid()
 void APathingGrid::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void APathingGrid::Tick(float DeltaSeconds)
-{
-}
-
-void APathingGrid::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
 
 	if (AllCells.Num() == 0)
 	{
@@ -46,10 +37,27 @@ void APathingGrid::OnConstruction(const FTransform& Transform)
 	DrawBlocks();
 }
 
-int APathingGrid::TestFunctionToCall(IHeuristicInterface* ReceivedFunction)
+void APathingGrid::Tick(float DeltaSeconds)
 {
-	return ReceivedFunction->TestFunctionPassing(83);
 }
+
+void APathingGrid::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	/*if (AllCells.Num() == 0)
+	{
+		
+
+		AllCells.SetNum(GetNumTiles());
+	}
+
+	BuildGrid();
+
+	UpdateBlockingTiles();
+	DrawBlocks();*/
+}
+
 
 int32 APathingGrid::GetTileIndexFromXY(int32 TileX, int32 TileY) const
 {
@@ -118,8 +126,25 @@ int32 APathingGrid::GetTileIndexFromWorldLocation(const FVector& WorldLocation) 
 	return 0;
 }
 
+FGridCell* APathingGrid::GetCellFromLocation(const FVector& WorldLocation)
+{
+	int32 X = 0, Y = 0;
+	GetXYFromWorldLocation(WorldLocation, X, Y);
+	
+	//UE_LOG(LogTemp, Log, TEXT("Location: X:%f Y:%f"),AllCells[GetTileIndexFromXY(X, Y)].Location.X, AllCells[GetTileIndexFromXY(X, Y)].Location.Y)
+
+	return &AllCells[GetTileIndexFromXY(Y, X)]; // reversed cause I was thinking rows to columns when the function uses columns to rows
+	
+	
+}
+
+FGridCell* APathingGrid::GetCellFromIndex(FCellIndex Index)
+{
+	return &AllCells[Index.Row * Rows + Index.Column];
+}
+
 bool APathingGrid::TransformWorldLocationToTileLocation(const FVector& InWorldLocation,
-	FVector& OutTileWorldLocation) const
+                                                        FVector& OutTileWorldLocation) const
 {
 	if (!IsWorldLocationInsideGrid(InWorldLocation))
 		return false;
@@ -155,8 +180,8 @@ void APathingGrid::UpdateBlockingTiles()
 	TArray<UFGGridBlockComponent*> AllBlocks;
 	GetComponents(AllBlocks);
 
-	AllCells.Empty();
-	AllCells.SetNum(GetNumTiles());
+	//AllCells.Empty();
+	//AllCells.SetNum(GetNumTiles());
 
 	TArray<int32> BlockIndices;
 
@@ -266,7 +291,7 @@ void APathingGrid::BuildGrid()
 		for (int c = 0; c < Columns; c++)
 		{
 			FVector CellOffset = FVector(TileSize * r, TileSize * c, 0.0f) + ZeroPos;
-			AllCells[Rows * r + c] = FGridCell(CellOffset);
+			AllCells[Rows * r + c].Location = CellOffset;
 			UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f"),CellOffset.X, CellOffset.Y)
 		}
 	}

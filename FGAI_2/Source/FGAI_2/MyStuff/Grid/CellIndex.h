@@ -14,7 +14,11 @@ public:
 		Column = C;
 	};
 
-	FCellIndex(){};
+	FCellIndex()
+	{
+		Row = 0;
+		Column = 0;
+	};
 	
 	int Row;
 
@@ -25,3 +29,13 @@ public:
 		return Other.Column == Column && Other.Row == Row;
 	}
 };
+
+struct FDirectionIndex{
+	int Dx;
+	int Dy;
+
+	bool operator ==(FDirectionIndex const OtherIndex ) const
+	{
+		return OtherIndex.Dx == Dx && OtherIndex.Dy == Dy;
+	}
+}; 

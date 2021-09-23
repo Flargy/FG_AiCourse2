@@ -1,6 +1,7 @@
 #include "StaticNamespaceTest.h"
+#include "FGAI_2/MyStuff/AStar/AStarPathFinder.h"
 
-void AStar::FHeuristicCalculations::CallableFunction3()
+bool AStar::FHeuristicCalculations::BasicHeuristics(FTileInfo Info, FGridCell* CurrentCell, FGridCell* Goal)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Calling function 3"))
+	return false;
 }

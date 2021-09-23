@@ -4,15 +4,7 @@
 #include "GridCell.h"
 #include "PathingGrid.generated.h"
 
-struct FDirectionIndex{
-	int Dx;
-	int Dy;
 
-	bool operator ==(FDirectionIndex const OtherIndex ) const
-	{
-		return OtherIndex.Dx == Dx && OtherIndex.Dy == Dy;
-	}
-}; 
 
 class UStaticMeshComponent;
 class UStaticMesh;
@@ -39,6 +31,9 @@ public:
 #pragma endregion
 	
 #pragma region Variables
+
+	UPROPERTY(Transient)
+	TArray<FGridCell> AllCells;
 	
 	TArray<FDirectionIndex> Directions = { {-1,-1,},{-1,0,},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1} };
 	
@@ -82,18 +77,6 @@ public:
 
 #pragma region Functions
 
-	TArray<FGridCell> GeneratePath(FVector StartingLocation, FVector EndLocation); // add agent type to this later
-
-	FGridCell GetCellFromVector(FVector Location);
-
-	FGridCell GetCellFromIndex(FCellIndex Index);
-
-	int TestFunctionToCall(IHeuristicInterface* ReceivedFunction);
-
-	void TestStaticCall(TFunctionRef<void()> ReceivedFunction)
-	{
-		ReceivedFunction();
-	}
 
 	UFUNCTION(BlueprintPure, Category = "Grid")
     float GetTileSizeHalf() const { return TileSize * 0.5f; }
@@ -124,11 +107,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Grid")
     FVector GetWorldLocationFromXY(int32 TileX, int32 TileY) const;
 
-	UFUNCTION(BlueprintPure, Category = "Grid")
+	UFUNCTION(BlueprintCallable, Category = "Grid")
     bool GetXYFromWorldLocation(const FVector& WorldLocation, int32& TileX, int32& TileY) const;
 
-	UFUNCTION(BlueprintPure, Category = "Grid")
+	UFUNCTION(BlueprintCallable, Category = "Grid")
     int32 GetTileIndexFromWorldLocation(const FVector& WorldLocation) const;
+
+	FGridCell* GetCellFromLocation(const FVector& WorldLocation);
+
+	FGridCell* GetCellFromIndex(FCellIndex Index);
 
 	UFUNCTION(BlueprintPure, Category = "Grid")
     bool TransformWorldLocationToTileLocation(const FVector& InWorldLocation, FVector& OutTileWorldLocation) const;
@@ -150,11 +137,6 @@ public:
 private:
 
 #pragma region Variables
-
-	UPROPERTY(Transient)
-	TArray<FGridCell> AllCells;
-
-
 	
 #pragma endregion 
 
