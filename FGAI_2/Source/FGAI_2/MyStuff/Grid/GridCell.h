@@ -32,6 +32,8 @@ public:
 	UPROPERTY()
 	FVector Location;
 
+	FCellIndex MyIndex;
+	
 	UPROPERTY()
 	bool bBlock = false;
 
@@ -62,11 +64,11 @@ struct FTileInfo
 
 	FGridCell* Cell;
 
-	float DistanceToGoal = 0.0f;
+	float HeuristicValue = 0.0f;
 	
-	float CurrentCost = 0.0f;
+	float StepCost = 0.0f;
 
-	FCellIndex* PreviousCell;
+	FTileInfo* PreviousCell;
 
 	explicit FTileInfo(FGridCell* MyCell)
 	{
@@ -74,7 +76,14 @@ struct FTileInfo
 		PreviousCell = nullptr;
 	}
 
-	FTileInfo(FGridCell* MyCell, FCellIndex * Previous)
+	FTileInfo(FGridCell* MyCell, FTileInfo * Previous, const float AccumulatedSteps)
+	{
+		Cell = MyCell;
+		PreviousCell = Previous;
+		StepCost = AccumulatedSteps;
+	}
+
+	FTileInfo(FGridCell* MyCell, FTileInfo* Previous)
 	{
 		Cell = MyCell;
 		PreviousCell = Previous;
@@ -89,5 +98,10 @@ struct FTileInfo
 	FORCEINLINE bool operator==(const FTileInfo &OtherInfo) const
 	{
 		return Cell == OtherInfo.Cell;
+	}
+
+	FORCEINLINE bool operator<(const FTileInfo &Other) const
+	{
+		return StepCost + HeuristicValue < Other.StepCost + Other.HeuristicValue;
 	}
 };

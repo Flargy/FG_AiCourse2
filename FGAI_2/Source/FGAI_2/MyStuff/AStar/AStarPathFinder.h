@@ -10,13 +10,15 @@ namespace AStar
 	{
 
 	public:
-		typedef TFunction<bool(FTileInfo, FGridCell*, FGridCell*)> FHeuristicsCalculation;
+		typedef TFunction<bool(FTileInfo*, FGridCell*)> FHeuristicsCalculation;
 	
 		static TArray<FGridCell*> GeneratePath(APathingGrid* Grid, FHeuristicsCalculation HeuristicsFunction, FGridCell* Start, FGridCell* Goal);
 
 		static TArray<FGridCell*> GeneratePath(APathingGrid* Grid, FHeuristicsCalculation HeuristicsFunction, FVector Start, FVector Goal);
 
+	private:
+		static TArray<FGridCell*> BuildFinalPath(FTileInfo* CellInfo);
 
-		float StepCost = 1000.0f;
+		static TArray<FGridCell*> BuildFinalPath(FTileInfo* TileInfo, TArray<FGridCell*>);
 	};
 }

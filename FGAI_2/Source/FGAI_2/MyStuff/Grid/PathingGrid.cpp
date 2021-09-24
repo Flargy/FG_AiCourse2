@@ -1,4 +1,6 @@
 #include "PathingGrid.h"
+
+#include "DrawDebugHelpers.h"
 #include "Components/StaticMeshComponent.h"
 #include "FGAI_2/Grid/FGGridBlockComponent.h"
 #include "FGAI_2/MyStuff/Interfaces/HeuristicInterface.h"
@@ -67,7 +69,7 @@ int32 APathingGrid::GetTileIndexFromXY(int32 TileX, int32 TileY) const
 	if (TileY < 0 || TileY >= Columns)
 		return false;
 
-	const int32 TileIndex = (TileY * Rows) + TileX;
+	const int32 TileIndex = (TileX * Rows) + TileY;
 	
 
 	if (!IsTileIndexValid(TileIndex))
@@ -133,7 +135,7 @@ FGridCell* APathingGrid::GetCellFromLocation(const FVector& WorldLocation)
 	
 	//UE_LOG(LogTemp, Log, TEXT("Location: X:%f Y:%f"),AllCells[GetTileIndexFromXY(X, Y)].Location.X, AllCells[GetTileIndexFromXY(X, Y)].Location.Y)
 
-	return &AllCells[GetTileIndexFromXY(Y, X)]; // reversed cause I was thinking rows to columns when the function uses columns to rows
+	return &AllCells[GetTileIndexFromXY(X, Y)]; // reversed cause I was thinking rows to columns when the function uses columns to rows
 	
 	
 }
@@ -195,6 +197,7 @@ void APathingGrid::UpdateBlockingTiles()
 
 		for (int32 Index = 0, Num = BlockIndices.Num(); Index < Num; ++Index)
 		{
+			DrawDebugSphere(GetWorld(), AllCells[BlockIndices[Index]].Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Black, false, 20.0f, 0, 8);
 			AllCells[BlockIndices[Index]].bBlock = true;
 			AllCells[BlockIndices[Index]].Type = Block->Type;
 		}
@@ -212,9 +215,9 @@ void APathingGrid::GetOverlappingTiles(const FVector& Origin, const FVector& Ext
 
 	FBox TileBox;
 
-	for (int32 Y = Columns - 1; Y >= 0; --Y)
+	for (int32 Y = Rows - 1; Y >= 0; --Y)
 	{
-		for (int32 X = 0; X < Rows; ++X)
+		for (int32 X = 0; X < Columns; ++X)
 		{
 			const FVector TileWorldLocation = GetWorldLocationFromXY(X, Y);
 			
@@ -222,6 +225,8 @@ void APathingGrid::GetOverlappingTiles(const FVector& Origin, const FVector& Ext
 			if (TileBox.IntersectXY(BlockBox))
 			{
 				const int32 ArrayIndex = GetTileIndexFromXY(X, Y);
+				FCellIndex Index = FCellIndex(X, Y);
+				//GetCellFromIndex(Index);
 				OutOverlappingTiles.Add(ArrayIndex);
 			}
 		}
@@ -233,7 +238,7 @@ void APathingGrid::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	UpdateBlockingTiles();
+	//UpdateBlockingTiles();
 }
 #endif // WITH_EDITOR
 
@@ -292,7 +297,8 @@ void APathingGrid::BuildGrid()
 		{
 			FVector CellOffset = FVector(TileSize * r, TileSize * c, 0.0f) + ZeroPos;
 			AllCells[Rows * r + c].Location = CellOffset;
-			UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f"),CellOffset.X, CellOffset.Y)
+			AllCells[Rows * r + c].MyIndex = FCellIndex(r, c);
+			//UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f"),CellOffset.X, CellOffset.Y)
 		}
 	}
 

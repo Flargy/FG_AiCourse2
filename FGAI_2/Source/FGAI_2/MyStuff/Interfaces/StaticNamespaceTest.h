@@ -8,7 +8,7 @@ namespace AStar
 	class FHeuristicCalculations
 	{
 	public:
-		static bool BasicHeuristics(FTileInfo Info, FGridCell* CurrentCell, FGridCell* Goal);
+		static bool BasicHeuristics(FTileInfo* Info, FGridCell* Goal);
 	};
 
 }
