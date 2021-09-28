@@ -35,7 +35,7 @@ public:
 	UPROPERTY(Transient)
 	TArray<FGridCell> AllCells;
 	
-	TArray<FDirectionIndex> Directions = { {-1,0,},{-1,1,},{0,-1},{0,1},{1,1},{1,-1},{-1,1},{-1,-1} };
+	TArray<FDirectionIndex> Directions = { {-1,0,},{1,0,},{0,-1},{0,1},{1,1},{1,-1},{-1,1},{-1,-1} };
 	
 	UPROPERTY()
 	UStaticMeshComponent* StaticMeshComponent = nullptr;
