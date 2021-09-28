@@ -66,7 +66,7 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 		OpenList.Sort(); // sorts the list
 	}
 
-	if(OpenList[0].Cell != Goal)
+	if(OpenList.Num() == 0)
 	{
 		// we didn't find the path and something is wrong
 		FinalPath.Add(Start);
