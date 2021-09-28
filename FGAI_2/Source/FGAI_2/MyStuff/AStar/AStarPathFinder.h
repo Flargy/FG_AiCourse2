@@ -10,7 +10,7 @@ namespace AStar
 	{
 
 	public:
-		typedef TFunction<bool(FTileInfo*, FGridCell*)> FHeuristicsCalculation;
+		typedef TFunction<bool(FTileInfo*,FDirectionIndex* Direction , FGridCell*)> FHeuristicsCalculation;
 	
 		static TArray<FGridCell*> GeneratePath(APathingGrid* Grid, FHeuristicsCalculation HeuristicsFunction, FGridCell* Start, FGridCell* Goal);
 

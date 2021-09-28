@@ -29,13 +29,14 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 		OpenList.RemoveAt(0);
 		ClosedList.Add(Parent);
 		
-		for (const FCellIndex Index : Parent.Cell->Neighbors)
+		for (FCellIndex Index : Parent.Cell->Neighbors)
 		{
 			FTileInfo Neighbor = FTileInfo(Grid->GetCellFromIndex(Index), &ClosedList.Top());
+
 			
 			Neighbor.StepCost = Parent.StepCost + StepCost; // gives it the step value
 
-			if(HeuristicsFunction(&Neighbor, Goal) && !ClosedList.Contains(Neighbor))
+			if(HeuristicsFunction(&Neighbor, &Index.Direction, Goal) && !ClosedList.Contains(Neighbor))
 			{
 				if(!OpenList.Contains(Neighbor))
 				{

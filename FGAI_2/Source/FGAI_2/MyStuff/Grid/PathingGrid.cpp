@@ -374,7 +374,7 @@ void APathingGrid::AssignNeighbors()
 				{
 					continue;
 				}
-				const FCellIndex AdjacentCellIndex = FCellIndex(r + x,c + y);
+				const FCellIndex AdjacentCellIndex = FCellIndex(r + x,c + y, Directions[i]);
 				AllCells[Rows * r + c].SetNeighbor(AdjacentCellIndex);
 				//UE_LOG(LogTemp, Log, TEXT("Me: %d:%d  Neighbor: %d:%d"),r,c,r + x, c + y)
 			}
