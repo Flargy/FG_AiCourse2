@@ -9,6 +9,8 @@ namespace AStar
 	{
 	public:
 		static bool BasicHeuristics(FTileInfo* Info, FDirectionIndex* Direction, FGridCell* Goal);
+
+		static bool GhostHeuristics(FTileInfo* Info, FDirectionIndex* Direction, FGridCell* Goal);
 	};
 
 }
