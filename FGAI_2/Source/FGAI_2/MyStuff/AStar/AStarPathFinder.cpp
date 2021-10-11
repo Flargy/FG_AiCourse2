@@ -6,7 +6,7 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
                                                          FGridCell* Start, FGridCell* Goal)
 {
 
-	// TODO: make diagonal movement more expensive
+	// TODO: something is wrong when you take too many steps
 	TArray<FGridCell*> FinalPath;
 
 	TArray<FTileInfo> OpenList;
@@ -14,7 +14,7 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 
 	OpenList.Add(FTileInfo(Start));
 
-	const float StepCost = 20.0f;
+	const float StepCost = 40.0f;
 	
 	while(OpenList.Num() > 0) // do A* here
 	{
@@ -33,7 +33,6 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 		{
 			FTileInfo Neighbor = FTileInfo(Grid->GetCellFromIndex(Index), &ClosedList.Top());
 
-			
 			Neighbor.StepCost = Parent.StepCost + StepCost; // gives it the step value
 
 			if(HeuristicsFunction(&Neighbor, &Index.Direction, Goal) && !ClosedList.Contains(Neighbor))
@@ -76,60 +75,11 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 
 	FinalPath = BuildFinalPath(&OpenList[0]);
 
-	FTileInfo* TileToTest = &OpenList[0];
-
 	for (auto Cell : FinalPath)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Counter"))
 		DrawDebugSphere(Grid->GetWorld(), Cell->Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Red, false, 20.0f, 0, 8);
 	}
 
-	/*for (int i = 0; i < FinalPath.Num() - 1; i++)
-	{
-		DrawDebugSphere(Grid->GetWorld(), FinalPath[i]->Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Red, false, 20.0f, 0, 8);
-	}*/
-
-	/*if(OpenList[0].PreviousCell == &OpenList[0])
-	{
-		UE_LOG(LogTemp, Log, TEXT("Fuck"))
-	}*/
-
-	/*for (auto Path : ClosedList)
-	{
-		if(Path.PreviousCell != nullptr)
-		UE_LOG(LogTemp, Log, TEXT("Tile value: %f"), Path.PreviousCell->StepCost)
-		DrawDebugSphere(Grid->GetWorld(), Path.Cell->Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Blue, false, 40.0f, 0, 8);
-	}*/
-
-
-	/*for (int i = 0; i < 12; i++)
-	{
-		if(TileToTest == nullptr)
-		{
-			break;
-		}
-		//UE_LOG(LogTemp, Log, TEXT("Tile value: %f"), TileToTest->HeuristicValue)
-		DrawDebugSphere(Grid->GetWorld(), TileToTest->Cell->Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Red, false, 20.0f, 0, 8);
-		TileToTest = TileToTest->PreviousCell;
-
-	}*/
-	
-
-	/*for (auto Tile : FinalPath)
-	{
-		DrawDebugSphere(Grid->GetWorld(), Tile->Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Black, false, 20.0f, 0, 8);
-
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("Open list size: %d"), OpenList.Num())
-
-
-	for (auto Tile : ClosedList)
-	{
-		DrawDebugSphere(Grid->GetWorld(), Tile.Cell->Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Red, false, 20.0f, 0, 8);
-	}*/
-
-	
 	DrawDebugSphere(Grid->GetWorld(), Start->Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Purple, false, 20.0f, 0, 8);
 	DrawDebugSphere(Grid->GetWorld(), Goal->Location, 80.0f, 20, FColor::Green, false, 20.0f, 0, 8);
 	

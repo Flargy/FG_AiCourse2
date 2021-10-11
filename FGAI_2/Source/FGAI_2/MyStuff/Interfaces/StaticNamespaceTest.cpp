@@ -12,7 +12,7 @@ bool AStar::FHeuristicCalculations::BasicHeuristics(FTileInfo* Info,FDirectionIn
 	float DirectionalMultiplier = 1.0f;
 	if(Direction->Dx != 0 && Direction->Dy != 0)
 	{
-		DirectionalMultiplier = 1.5f;
+		DirectionalMultiplier = 2.0f;
 	}
 	
 	const FCellIndex CurrentIndex = Info->Cell->MyIndex;

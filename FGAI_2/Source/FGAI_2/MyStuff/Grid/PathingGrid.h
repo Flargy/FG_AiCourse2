@@ -77,7 +77,7 @@ public:
 
 #pragma region Functions
 
-
+	
 	UFUNCTION(BlueprintPure, Category = "Grid")
     float GetTileSizeHalf() const { return TileSize * 0.5f; }
 	UFUNCTION(BlueprintPure, Category = "Grid")
@@ -125,6 +125,8 @@ public:
 	void UpdateBlockingTiles();
 
 	void GetOverlappingTiles(const FVector& Origin, const FVector& Extent, TArray<int32>& OutOverlappingTiles) const;
+
+	void UpdateBlockingTransforms();
 
 	
 #if WITH_EDITOR

@@ -1,4 +1,5 @@
 #include "FGGridBlockComponent.h"
+#include "FGAI_2/MyStuff/Grid/PathingGrid.h"
 #include "FGGridActor.h"
 
 UFGGridBlockComponent::UFGGridBlockComponent()
@@ -39,13 +40,13 @@ void UFGGridBlockComponent::OnUpdateTransform(EUpdateTransformFlags UpdateTransf
 {
 	Super::OnUpdateTransform(UpdateTransformFlags, Teleport);
 
-	AFGGridActor* GridOwner = Cast<AFGGridActor>(GetOwner());
+	APathingGrid* GridOwner = Cast<APathingGrid>(GetOwner());
 
 	if (GridOwner == nullptr)
 	{
 		return;
 	}
 
-	GridOwner->UpdateBlockingTiles();
+	GridOwner->UpdateBlockingTransforms();
 }
 

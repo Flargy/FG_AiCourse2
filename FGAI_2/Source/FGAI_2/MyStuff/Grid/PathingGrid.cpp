@@ -36,7 +36,7 @@ void APathingGrid::BeginPlay()
 	BuildGrid();
 
 	UpdateBlockingTiles();
-	DrawBlocks();
+	//DrawBlocks();
 }
 
 void APathingGrid::Tick(float DeltaSeconds)
@@ -47,7 +47,7 @@ void APathingGrid::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	/*if (AllCells.Num() == 0)
+	if (AllCells.Num() == 0)
 	{
 		
 
@@ -57,9 +57,8 @@ void APathingGrid::OnConstruction(const FTransform& Transform)
 	BuildGrid();
 
 	UpdateBlockingTiles();
-	DrawBlocks();*/
+	//DrawBlocks();
 }
-
 
 int32 APathingGrid::GetTileIndexFromXY(int32 TileX, int32 TileY) const
 {
@@ -69,7 +68,7 @@ int32 APathingGrid::GetTileIndexFromXY(int32 TileX, int32 TileY) const
 	if (TileY < 0 || TileY >= Columns)
 		return false;
 
-	const int32 TileIndex = (TileX * Rows) + TileY;
+	const int32 TileIndex = (TileX * Columns) + TileY;
 	
 
 	if (!IsTileIndexValid(TileIndex))
@@ -105,14 +104,14 @@ bool APathingGrid::GetXYFromWorldLocation(const FVector& WorldLocation, int32& T
 
 	const FVector RelativeGridLocation = GetActorTransform().InverseTransformPositionNoScale(WorldLocation);
 
-	const float HeightOffset = (Columns % 2) == 1 ? 0.5f : 0.0f;
 	const float WidthOffset = (Rows % 2) == 1 ? 0.5f : 0.0f;
+	const float HeightOffset = (Columns % 2) == 1 ? 0.5f : 0.0f;
 
 	const float X = FMath::FloorToInt(WidthOffset + (RelativeGridLocation.X / TileSize)) + GetHalfWidth() - WidthOffset;
 	const float Y = FMath::FloorToInt(HeightOffset + (RelativeGridLocation.Y / TileSize)) + GetHalfHeight() - HeightOffset;
 
-	TileX = FMath::Clamp(static_cast<int32>(X), 0, Columns - 1);
-	TileY = FMath::Clamp(static_cast<int32>(Y), 0, Rows - 1);
+	TileX = FMath::Clamp(static_cast<int32>(X), 0, Rows - 1);
+	TileY = FMath::Clamp(static_cast<int32>(Y), 0, Columns - 1);
 
 	return true;
 }
@@ -135,14 +134,14 @@ FGridCell* APathingGrid::GetCellFromLocation(const FVector& WorldLocation)
 	
 	//UE_LOG(LogTemp, Log, TEXT("Location: X:%f Y:%f"),AllCells[GetTileIndexFromXY(X, Y)].Location.X, AllCells[GetTileIndexFromXY(X, Y)].Location.Y)
 
-	return &AllCells[GetTileIndexFromXY(X, Y)]; // reversed cause I was thinking rows to columns when the function uses columns to rows
+	return &AllCells[GetTileIndexFromXY(X, Y)];
 	
 	
 }
 
 FGridCell* APathingGrid::GetCellFromIndex(FCellIndex Index)
 {
-	return &AllCells[Index.Row * Rows + Index.Column];
+	return &AllCells[Index.Row * Columns + Index.Column];
 }
 
 bool APathingGrid::TransformWorldLocationToTileLocation(const FVector& InWorldLocation,
@@ -197,7 +196,7 @@ void APathingGrid::UpdateBlockingTiles()
 
 		for (int32 Index = 0, Num = BlockIndices.Num(); Index < Num; ++Index)
 		{
-			DrawDebugSphere(GetWorld(), AllCells[BlockIndices[Index]].Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Black, false, 20.0f, 0, 8);
+			//DrawDebugSphere(GetWorld(), AllCells[BlockIndices[Index]].Location + FVector::UpVector * 100.0f, 80.0f, 20, FColor::Black, false, 5.0f, 0, 8);
 			AllCells[BlockIndices[Index]].bBlock = true;
 			AllCells[BlockIndices[Index]].Type = Block->Type;
 		}
@@ -233,12 +232,20 @@ void APathingGrid::GetOverlappingTiles(const FVector& Origin, const FVector& Ext
 	}
 }
 
+void APathingGrid::UpdateBlockingTransforms()
+{
+	BuildGrid();
+	UpdateBlockingTiles();
+}
+
 #if WITH_EDITOR
 void APathingGrid::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	//UpdateBlockingTiles();
+	BuildGrid();
+	UpdateBlockingTiles();
+	//DrawBlocks();
 }
 #endif // WITH_EDITOR
 
@@ -246,23 +253,26 @@ void APathingGrid::BuildGrid()
 {
 	if (Rows < 1 || Columns < 1)
 		return;
+
+	AllCells.Empty();
+	AllCells.SetNum(GetNumTiles());
 	
 	const float Location_X = -(Rows * TileSize * 0.5f);
 	const float Location_Y = -(Columns * TileSize * 0.5f);
 	
 #pragma region DrawBoxEdges
+	
+	MeshDescription = nullptr;
+	GridMesh = nullptr;
 	if (MeshDescription == nullptr)
 		MeshDescription = UStaticMesh::CreateStaticMeshDescription(this);
 
 	if (GridMesh == nullptr)
 		GridMesh = NewObject<UStaticMesh>(this, UStaticMesh::StaticClass());
 
-	MeshDescription->Empty();
 
 	FPolygonGroupID PGID = MeshDescription->CreatePolygonGroup();
 	FPolygonID PID;
-
-	
 
 	for (int X = 0; X < Rows + 1; ++X)
 	{
@@ -296,8 +306,8 @@ void APathingGrid::BuildGrid()
 		for (int c = 0; c < Columns; c++)
 		{
 			FVector CellOffset = FVector(TileSize * r, TileSize * c, 0.0f) + ZeroPos;
-			AllCells[Rows * r + c].Location = CellOffset;
-			AllCells[Rows * r + c].MyIndex = FCellIndex(r, c);
+			AllCells[Columns * r + c].Location = CellOffset;
+			AllCells[Columns * r + c].MyIndex = FCellIndex(r, c);
 			//UE_LOG(LogTemp, Log, TEXT("X: %f Y: %f"),CellOffset.X, CellOffset.Y)
 		}
 	}
@@ -314,14 +324,14 @@ void APathingGrid::DrawBlocks()
 
 	if (NumBlocks == 0)
 		return;
+	BlockMeshDescription = nullptr;
+	BlockMesh = nullptr;
 
 	if (BlockMeshDescription == nullptr)
 		BlockMeshDescription = UStaticMesh::CreateStaticMeshDescription(this);
 
 	if (BlockMesh == nullptr)
 		BlockMesh = NewObject<UStaticMesh>(this, UStaticMesh::StaticClass());
-		
-	BlockMeshDescription->Empty();
 
 	BlockStaticMeshComponent->SetStaticMesh(nullptr);
 
@@ -331,9 +341,9 @@ void APathingGrid::DrawBlocks()
 	const float BlockSize = TileSize * 0.25f;
 	const FVector BlockExtent = FVector(BlockSize, BlockSize, BlockSize * 0.25f);
 
-	for (int32 Y = Columns - 1; Y >= 0; --Y)
+	for (int32 Y = Rows - 1; Y >= 0; --Y)
 	{
-		for (int32 X = 0; X < Rows; ++X)
+		for (int32 X = 0; X < Columns; ++X)
 		{
 			const FVector TileRelativeLocation = GetActorTransform().InverseTransformPositionNoScale(GetWorldLocationFromXY(X, Y));
 			const int32 ArrayIndex = GetTileIndexFromXY(X, Y);
@@ -375,9 +385,10 @@ void APathingGrid::AssignNeighbors()
 					continue;
 				}
 				const FCellIndex AdjacentCellIndex = FCellIndex(r + x,c + y, Directions[i]);
-				AllCells[Rows * r + c].SetNeighbor(AdjacentCellIndex);
+				AllCells[Columns * r + c].SetNeighbor(AdjacentCellIndex);
 				//UE_LOG(LogTemp, Log, TEXT("Me: %d:%d  Neighbor: %d:%d"),r,c,r + x, c + y)
 			}
 		}
 	}
+
 }
