@@ -11,27 +11,30 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 
 	TArray<FTileInfo> OpenList;
 	TArray<FTileInfo> ClosedList;
+	ClosedList.SetNum(Grid->GetNumTiles()); // builds the array at maximum size so that the memory never gets shifted
+	int ClosedCounter = 0;
+	FTileInfo End;
 
 	OpenList.Add(FTileInfo(Start));
 
-	const float StepCost = 40.0f;
+	const float StepCost = 2.0f;
 	
-	while(OpenList.Num() > 0) // do A* here
+	while(OpenList.Num() > 0) 
 	{
 		if(OpenList[0].Cell == Goal)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("goal found"))
+			End = OpenList[0];
 			break;
 		}
 		
 		FTileInfo Parent = OpenList[0];
 		
 		OpenList.RemoveAt(0);
-		ClosedList.Add(Parent);
-		
+		ClosedList[ClosedCounter] = Parent;
 		for (FCellIndex Index : Parent.Cell->Neighbors)
 		{
-			FTileInfo Neighbor = FTileInfo(Grid->GetCellFromIndex(Index), &ClosedList.Top());
+			FTileInfo Neighbor = FTileInfo(Grid->GetCellFromIndex(Index), &ClosedList[ClosedCounter]);
 
 			Neighbor.StepCost = Parent.StepCost + StepCost; // gives it the step value
 
@@ -61,7 +64,7 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 			}
 		}
 		
-
+		ClosedCounter++;
 		OpenList.Sort(); // sorts the list
 	}
 
@@ -71,9 +74,9 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 		FinalPath.Add(Start);
 		return FinalPath;
 	}
-
-
-	FinalPath = BuildFinalPath(&OpenList[0]);
+	OpenList.Empty(); // Free up the space cause we dont need it anymore
+	
+	FinalPath = BuildFinalPath(&End);
 
 	for (auto Cell : FinalPath)
 	{
@@ -112,6 +115,10 @@ TArray<FGridCell*> AStar::FAStarPathFinder::GeneratePath(APathingGrid* Grid, con
 TArray<FGridCell*> AStar::FAStarPathFinder::BuildFinalPath(FTileInfo* CellInfo, TArray<FGridCell*> FinalPath)
 {
 	if(CellInfo->PreviousCell == nullptr)
+	{
+		return FinalPath;
+	}
+	if(CellInfo->Cell == nullptr)
 	{
 		return FinalPath;
 	}

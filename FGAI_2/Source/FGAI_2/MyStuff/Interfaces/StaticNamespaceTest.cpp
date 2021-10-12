@@ -19,7 +19,7 @@ bool AStar::FHeuristicCalculations::BasicHeuristics(FTileInfo* Info,FDirectionIn
 	const FCellIndex GoalIndex = Goal->MyIndex;
 
 	// Chebyshev distance
-	Info->HeuristicValue = FMath::Max(FMath::Abs(CurrentIndex.Row - GoalIndex.Row), FMath::Abs(CurrentIndex.Column - GoalIndex.Column) * 10 ) * DirectionalMultiplier * Info->Cell->PathCostMultiplier;
+	Info->HeuristicValue = FMath::Max(FMath::Abs(CurrentIndex.Row - GoalIndex.Row), FMath::Abs(CurrentIndex.Column - GoalIndex.Column) * 1 ) * DirectionalMultiplier * Info->Cell->PathCostMultiplier;
 	
 	return true;
 }
@@ -30,14 +30,14 @@ bool AStar::FHeuristicCalculations::GhostHeuristics(FTileInfo* Info, FDirectionI
 	float DirectionalMultiplier = 1.0f;
 	if(Direction->Dx != 0 && Direction->Dy != 0)
 	{
-		DirectionalMultiplier = 1.5f;
+		DirectionalMultiplier = 2.0f;
 	}
 	
 	const FCellIndex CurrentIndex = Info->Cell->MyIndex;
 	const FCellIndex GoalIndex = Goal->MyIndex;
 
 	// Chebyshev distance
-	Info->HeuristicValue = FMath::Max(FMath::Abs(CurrentIndex.Row - GoalIndex.Row), FMath::Abs(CurrentIndex.Column - GoalIndex.Column) * 10 ) * DirectionalMultiplier;
+	Info->HeuristicValue = FMath::Max(FMath::Abs(CurrentIndex.Row - GoalIndex.Row), FMath::Abs(CurrentIndex.Column - GoalIndex.Column) * 1 ) * DirectionalMultiplier;
 	
 	return true;
 }
